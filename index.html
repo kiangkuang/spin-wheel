@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>Spin Wheel</title>
     <style>
+        :root {
+            --size: 500px;
+        }
+
         * {
             box-sizing: border-box;
         }
@@ -21,33 +25,32 @@
         }
 
         .container {
-            min-width: 500px;
-            min-height: 500px;
+            min-width: var(--size);
+            min-height: var(--size);
             background-color: #ccc;
             border-radius: 50%;
-            border: 15px solid #fff;
+            border: calc(var(--size) / 40) solid #fff;
             position: relative;
             overflow: hidden;
-            transition: 5s;
         }
 
         .container div {
             height: 50%;
-            width: 126px;
+            width: 27%;
             position: absolute;
             clip-path: polygon(100% 0, 50% 100%, 0 0);
             transform: translateX(-50%);
             transform-origin: bottom;
             text-align: center;
             display: flex;
-            padding-top: 24px;
+            padding-top: calc(var(--size) / 20);
             justify-content: center;
-            font-size: 12px;
+            font-size: calc(var(--size) / 40);
             font-weight: bold;
             font-family: sans-serif;
             color: #fff;
-            left: 171.5px;
-            word-spacing: 999px;
+            left: 36.5%;
+            word-spacing: var(--size);
         }
 
         .container .one {
@@ -112,7 +115,7 @@
 
         .arrow {
             position: absolute;
-            top: calc(50% - 250px);
+            top: calc(50% - var(--size) / 2);
             left: 50%;
             transform: translateX(-50%);
             color: #fff;
@@ -121,7 +124,7 @@
 
         .arrow::before {
             content: "▼";
-            font-size: 30px;
+            font-size: calc(var(--size) / 15);
         }
 
         #spin {
@@ -132,8 +135,8 @@
             z-index: 10;
             background-color: #fff;
             border: none;
-            width: 100px;
-            height: 100px;
+            width: calc(var(--size) / 5);
+            height: calc(var(--size) / 5);
             border-radius: 50%;
             cursor: pointer;
         }
@@ -176,11 +179,15 @@
         btn.onclick = () => {
             angle += 360 * 5 + Math.ceil(Math.random() * 360);
             if ((angle + 15) % 30 === 0) angle += 5; // avoid land on edge
+            container.style.transition = '5s';
             container.style.transform = `rotate(${angle}deg)`;
 
             clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
                 const value = angle % 360;
+                container.style.transition = 'none';
+                container.style.transform = `rotate(${value}deg)`;
+
                 const resultRange = [
                     {
                         class: '.one',
