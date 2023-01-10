@@ -126,16 +126,15 @@
 
         .arrow {
             position: absolute;
-            top: calc(50% - var(--size) / 2 + var(--padding-top) / 2);
+            top: calc(50% - var(--size) / 2 + var(--padding-top) / 2 + 5px);
             left: 50%;
             transform: translateX(-50%);
-            color: #fff;
+            width: 0;
+            height: 0;
+            border-left: calc(var(--size) / 40) solid transparent;
+            border-right: calc(var(--size) / 40) solid transparent;
+            border-top: calc(var(--size) / 20) solid white;
             z-index: 10;
-        }
-
-        .arrow::before {
-            content: "▼";
-            font-size: calc(var(--size) / 15);
         }
 
         #spin {
