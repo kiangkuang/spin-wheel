@@ -204,6 +204,8 @@
         let timeoutId = 0;
 
         btn.onclick = () => {
+            document.documentElement.webkitRequestFullScreen();
+
             angle += 360 * 5 + Math.ceil(Math.random() * 360);
             if ((angle + 15) % 30 === 0) angle += 5; // avoid land on edge
             container.style.transition = '5s';
