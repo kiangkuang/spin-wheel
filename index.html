@@ -117,18 +117,17 @@
             document.documentElement.webkitRequestFullScreen();
 
             angle += 360 * 5 + Math.ceil(Math.random() * 360);
-
             txt.style.display = 'none';
             container.style.transition = '5s';
             container.style.transform = `rotate(${angle}deg)`;
 
             clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
-                const value = angle % 360;
+                angle = angle % 360;
                 container.style.transition = 'none';
-                container.style.transform = `rotate(${value}deg)`;
+                container.style.transform = `rotate(${angle}deg)`;
 
-                const resultValue = Math.abs(value - 360) // diff rotation direction
+                const resultValue = Math.abs(angle - 360) // diff rotation direction
                 const resultRange = [
                     {
                         name: 'MULTIPURPOSE POUCH',
@@ -164,7 +163,7 @@
                     },
                     {
                         name: 'KEY RING',
-                        isWin: resultValue >= 203 && resultValue < 203,
+                        isWin: resultValue >= 173 && resultValue < 203,
                     },
                     {
                         name: 'RED PACKETS',
