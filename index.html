@@ -38,90 +38,12 @@
         .container {
             min-width: var(--size);
             min-height: var(--size);
-            background-color: #ccc;
+            background-color: #fff;
+            border: solid 1px #fff;
             border-radius: 50%;
-            border: calc(var(--size) / 40) solid #fff;
             position: relative;
             overflow: hidden;
             box-shadow: black 0 0 calc(var(--size) / 25);
-        }
-
-        .container div {
-            height: 50%;
-            width: 27%;
-            position: absolute;
-            clip-path: polygon(100% 0, 50% 100%, 0 0);
-            transform: translateX(-50%);
-            transform-origin: bottom;
-            text-align: center;
-            display: flex;
-            padding-top: calc(var(--size) / 20);
-            justify-content: center;
-            font-size: calc(var(--size) / 40);
-            font-weight: bold;
-            color: #fff;
-            left: 36.5%;
-            word-spacing: var(--size);
-        }
-
-        .container .one {
-            background-color: #ffad00;
-            transform: rotate(0deg);
-        }
-
-        .container .two {
-            background-color: #00214a;
-            transform: rotate(30deg);
-        }
-
-        .container .three {
-            background-color: #f20000;
-            transform: rotate(60deg);
-        }
-
-        .container .four {
-            background-color: #00214a;
-            transform: rotate(90deg);
-        }
-
-        .container .five {
-            background-color: #f20000;
-            transform: rotate(120deg);
-        }
-
-        .container .six {
-            background-color: #00214a;
-            transform: rotate(150deg);
-        }
-
-        .container .seven {
-            background-color: #f20000;
-            transform: rotate(180deg);
-        }
-
-        .container .eight {
-            background-color: #00214a;
-            transform: rotate(210deg);
-        }
-
-        .container .nine {
-            background-color: #f20000;
-            transform: rotate(240deg);
-        }
-
-        .container .ten {
-            background-color: #00214a;
-            transform: rotate(270deg);
-        }
-
-        .container .eleven {
-            background-color: #f20000;
-            transform: rotate(300deg);
-        }
-
-        .container .twelve {
-            background-color: #00214a;
-            transform: rotate(330deg);
         }
 
         .arrow {
@@ -162,7 +84,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, calc(-50% + var(--padding-top) / 2));
-            color: white;
+            color: #fff;
             font-size: 38px;
             font-weight: bold;
             background: rgba(0, 0, 0, 0.8);
@@ -178,28 +100,11 @@
 
 <body>
     <span id="text">Click the logo to spin!</span>
-    <button id="spin">
-        <img src="logo.webp">
-    </button>
     <span class="arrow"></span>
-    <div class="container">
-        <div class="one">$100 NETS MOTORING CARD</div>
-        <div class="two">RED PACKETS</div>
-        <div class="three">PHILIPS KETTLE</div>
-        <div class="four">FREE HOME CONTENT</div>
-        <div class="five">PHILIPS ELECTRONICS TOOTHBRUSH</div>
-        <div class="six">MULTIPURPOSE POUCH</div>
-        <div class="seven">HLAS CALENDAR</div>
-        <div class="eight">FREE HOME CONTENT</div>
-        <div class="nine">ORANGE BAG</div>
-        <div class="ten">GOLF UMBRELLA</div>
-        <div class="eleven">BOTTLE OPENER WITH KEYRING</div>
-        <div class="twelve">ORANGE BAG</div>
-    </div>
+    <img src="wheel.png" class="container">
     </div>
     <script>
         const container = document.querySelector('.container');
-        const btn = document.getElementById('spin');
         const txt = document.getElementById('text');
         let angle = 0;
         let timeoutId = 0;
@@ -208,12 +113,12 @@
             txt.style.display = 'none';
         }
 
-        btn.onclick = () => {
-
+        container.onclick = () => {
             document.documentElement.webkitRequestFullScreen();
 
             angle += 360 * 5 + Math.ceil(Math.random() * 360);
-            if ((angle + 15) % 30 === 0) angle += 5; // avoid land on edge
+
+            txt.style.display = 'none';
             container.style.transition = '5s';
             container.style.transform = `rotate(${angle}deg)`;
 
@@ -223,61 +128,76 @@
                 container.style.transition = 'none';
                 container.style.transform = `rotate(${value}deg)`;
 
+                const resultValue = Math.abs(value - 360) // diff rotation direction
                 const resultRange = [
                     {
-                        class: '.one',
-                        isWin: value < 15 || value >= 345,
+                        name: 'MULTIPURPOSE POUCH',
+                        isWin: resultValue >= 0 && resultValue < 35,
                     },
                     {
-                        class: '.two',
-                        isWin: value < 345 && value >= 315,
+                        name: 'UMBRELLA',
+                        isWin: resultValue >= 35 && resultValue < 51,
                     },
                     {
-                        class: '.three',
-                        isWin: value < 315 && value >= 285,
+                        name: 'FREE HOME CONTENT',
+                        isWin: resultValue >= 51 && resultValue < 81,
                     },
                     {
-                        class: '.four',
-                        isWin: value < 285 && value >= 255,
+                        name: 'TOOTHBRUSH',
+                        isWin: resultValue >= 81 && resultValue < 89,
                     },
                     {
-                        class: '.five',
-                        isWin: value < 255 && value >= 225,
+                        name: 'KEY RING',
+                        isWin: resultValue >= 89 && resultValue < 119,
                     },
                     {
-                        class: '.six',
-                        isWin: value < 225 && value >= 195,
+                        name: 'HLAS CALENDARS',
+                        isWin: resultValue >= 119 && resultValue < 135,
                     },
                     {
-                        class: '.seven',
-                        isWin: value < 195 && value >= 165,
+                        name: 'FREE HOME CONTENT',
+                        isWin: resultValue >= 135 && resultValue < 165,
                     },
                     {
-                        class: '.eight',
-                        isWin: value < 165 && value >= 135,
+                        name: 'KETTLE',
+                        isWin: resultValue >= 165 && resultValue < 173,
                     },
                     {
-                        class: '.nine',
-                        isWin: value < 135 && value >= 105,
+                        name: 'KEY RING',
+                        isWin: resultValue >= 203 && resultValue < 203,
                     },
                     {
-                        class: '.ten',
-                        isWin: value < 105 && value >= 75,
+                        name: 'RED PACKETS',
+                        isWin: resultValue >= 203 && resultValue < 219,
                     },
                     {
-                        class: '.eleven',
-                        isWin: value < 75 && value >= 45,
+                        name: 'FREE HOME CONTENT',
+                        isWin: resultValue >= 219 && resultValue < 249,
                     },
                     {
-                        class: '.twelve',
-                        isWin: value < 45 && value >= 15,
+                        name: 'FIRST AID KITS',
+                        isWin: resultValue >= 249 && resultValue < 257,
+                    },
+                    {
+                        name: 'CONTAINER',
+                        isWin: resultValue >= 257 && resultValue < 292,
+                    },
+                    {
+                        name: 'FREE HOME CONTENT',
+                        isWin: resultValue >= 292 && resultValue < 322,
+                    },
+                    {
+                        name: '$100 NETS CARD',
+                        isWin: resultValue >= 322 && resultValue < 330,
+                    },
+                    {
+                        name: 'KEY RING',
+                        isWin: resultValue >= 330 && resultValue < 360,
                     },
                 ];
-                console.log(value);
-                const prize = document.querySelector(resultRange.find((x) => x.isWin).class).innerText;
 
                 txt.style.display = 'unset';
-                txt.innerText = `You won ${prize}!`
+                txt.innerText = `You won ${resultRange.find((x) => x.isWin).name}!`
             }, 5500);
         };
     </script>
