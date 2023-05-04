@@ -8,7 +8,7 @@
         :root {
             --size: 820px;
             --padding-top: 500px;
-            --wheel: url(wheel-redeemed-5.png);
+            --wheel: url(wheel-redeemed.png);
         }
 
         * {
@@ -142,53 +142,32 @@
                 const resultValue = Math.abs(angle - 360); // flip rotation direction
                 var prize = '';
                 switch (true) {
-                    case resultValue <= 35:
-                        prize = 'MULTIPURPOSE POUCH';
+                    case resultValue <= 40:
+                        prize = 'Add 10% off Single Travel Plan';
                         break;
-                    case resultValue <= 51:
-                        prize = 'UMBRELLA';
+                    case resultValue <= 80:
+                        prize = '10% OFF MAID INSURANCE';
                         break;
-                    case resultValue <= 81:
-                        prize = 'FREE HOME CONTENT';
+                    case resultValue <= 120:
+                        prize = 'TRAVEL MUG';
                         break;
-                    case resultValue <= 89:
-                        prize = 'TOOTHBRUSH';
+                    case resultValue <= 160:
+                        prize = 'Add 5% off Single Travel Plan';
                         break;
-                    case resultValue <= 119:
-                        prize = 'KEY RING';
+                    case resultValue <= 200:
+                        prize = 'Add 10% off Single Travel Plan';
                         break;
-                    case resultValue <= 135:
-                        prize = 'HLAS CALENDARS';
+                    case resultValue <= 240:
+                        prize = '10% OFF MAID INSURANCE';
                         break;
-                    case resultValue <= 165:
-                        prize = 'FREE HOME CONTENT';
+                    case resultValue <= 280:
+                        prize = 'Add 20% off Single Travel Plan';
                         break;
-                    case resultValue <= 173:
-                        prize = 'KETTLE';
-                        break;
-                    case resultValue <= 203:
-                        prize = 'KEY RING';
-                        break;
-                    case resultValue <= 219:
-                        prize = 'RED PACKETS';
-                        break;
-                    case resultValue <= 249:
-                        prize = 'FREE HOME CONTENT';
-                        break;
-                    case resultValue <= 257:
-                        prize = 'FIRST AID KITS';
-                        break;
-                    case resultValue <= 292:
-                        prize = 'CONTAINER';
-                        break;
-                    case resultValue <= 322:
-                        prize = 'FREE HOME CONTENT';
-                        break;
-                    case resultValue <= 330:
-                        prize = '$100 NETS CARD';
+                    case resultValue <= 320:
+                        prize = 'TRAVEL MUG';
                         break;
                     case resultValue <= 360:
-                        prize = 'KEY RING';
+                        prize = 'Add 5% off Single Travel Plan';
                         break;
                 }
 
