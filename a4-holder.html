@@ -8,7 +8,7 @@
         :root {
             --size: 820px;
             --padding-top: 500px;
-            --wheel: url(wheel-redeemed.png);
+            --wheel: url(wheel-a4-holder.png);
         }
 
         * {
@@ -94,7 +94,6 @@
             z-index: 20;
             display: none;
         }
-
     </style>
 </head>
 
@@ -142,32 +141,41 @@
                 const resultValue = Math.abs(angle - 360); // flip rotation direction
                 var prize = '';
                 switch (true) {
-                    case resultValue <= 40:
-                        prize = 'Add 10% off Single Travel Plan';
+                    case resultValue <= 43:
+                        prize = 'HL Assurance Small Hand Towel';
                         break;
-                    case resultValue <= 80:
-                        prize = '10% OFF MAID INSURANCE';
+                    case resultValue <= 62:
+                        prize = 'Limited Edition Calendar';
                         break;
-                    case resultValue <= 120:
-                        prize = 'TRAVEL MUG';
+                    case resultValue <= 73.5:
+                        prize = '$100 Watt Charging Card';
                         break;
-                    case resultValue <= 160:
-                        prize = 'Add 5% off Single Travel Plan';
+                    case resultValue <= 112:
+                        prize = 'Free Home Content Insurance';
                         break;
-                    case resultValue <= 200:
-                        prize = 'Add 10% off Single Travel Plan';
+                    case resultValue <= 153.5:
+                        prize = 'HL Assurance Mini Tool Kit';
                         break;
-                    case resultValue <= 240:
-                        prize = '10% OFF MAID INSURANCE';
+                    case resultValue <= 192:
+                        prize = 'HL Assurance A4 Holder';
                         break;
-                    case resultValue <= 280:
-                        prize = 'Add 20% off Single Travel Plan';
+                    case resultValue <= 221:
+                        prize = 'HL Assurance Umbrella';
+                        break;
+                    case resultValue <= 252:
+                        prize = 'HL Assurance Mug';
+                        break;
+                    case resultValue <= 266.5:
+                        prize = 'Difflam Herbal Mouth Spray';
+                        break;
+                    case resultValue <= 278:
+                        prize = '$100 Motoring Card';
                         break;
                     case resultValue <= 320:
-                        prize = 'TRAVEL MUG';
+                        prize = 'Free Home Content Insurance';
                         break;
                     case resultValue <= 360:
-                        prize = 'Add 5% off Single Travel Plan';
+                        prize = 'HL Assurance Mini Tool Kit';
                         break;
                 }
 
