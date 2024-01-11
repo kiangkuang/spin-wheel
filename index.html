@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://unpkg.com/css-paint-polyfill"></script>
+    <script src="https://cdn.jsdelivr.net/npm/spin-wheel@4.3.1/dist/spin-wheel-iife.js"></script>
+  </head>
+
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-image: url('bg.jpg');
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: 50% 50%;
+    "
+    onclick="fullscreen()"
+  >
+    <div
+      class="d-flex justify-content-center align-items-center"
+      style="height: 100vh; width: 100vw; padding-top: 20vh"
+    >
+      <div class="d-flex justify-content-center align-items-center">
+        <div
+          class="wheel-container"
+          style="
+            width: 95vw;
+            height: 95vw;
+            max-height: 95vw;
+            border-radius: 50%;
+            box-shadow: black 0 0 5vw;
+          "
+          onclick="spin()"
+        ></div>
+
+        <div
+          class="position-absolute d-flex justify-content-center align-items-center text-center"
+        >
+          <div
+            class="toast"
+            onclick="toast.hide()"
+            style="
+              --bs-toast-max-width: 50vw;
+              --bs-toast-border-radius: 2vw;
+              --bs-toast-font-size: 5vw;
+              --bs-toast-color: white;
+              --bs-toast-bg: rgba(0, 0, 0, 0.85);
+            "
+          >
+            <div class="toast-body"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const items = [
+        {
+          label: "Small Hand Towel",
+          backgroundColor: "red",
+          weight: 43,
+        },
+        {
+          label: "Limited Edition Calendar",
+          backgroundColor: "navy",
+          weight: 19,
+        },
+        {
+          label: "$100 Watt Charging Card",
+          backgroundColor: "orange",
+          weight: 12,
+        },
+        {
+          label: "Free Home Content Insurance",
+          backgroundColor: "red",
+          weight: 38,
+        },
+        {
+          label: "Mini Tool Kit",
+          backgroundColor: "navy",
+          weight: 41,
+        },
+        {
+          label: "A4 Holder",
+          backgroundColor: "red",
+          weight: 38,
+        },
+        {
+          label: "Umbrella",
+          backgroundColor: "navy",
+          weight: 29,
+        },
+        {
+          label: "Mug",
+          backgroundColor: "red",
+          weight: 60,
+        },
+        {
+          label: "Difflam HerbalMouth Spray",
+          backgroundColor: "navy",
+          weight: 14,
+        },
+        {
+          label: "$100 Motoring Card",
+          backgroundColor: "orange",
+          weight: 12,
+        },
+        {
+          label: "Free Home Content Insurance",
+          backgroundColor: "red",
+          weight: 42,
+        },
+        {
+          label: "Mini Tool Kit",
+          backgroundColor: "navy",
+          weight: 40,
+        },
+      ];
+
+      const wheel = new spinWheel.Wheel(
+        document.querySelector(".wheel-container"),
+        {
+          isInteractive: false,
+          overlayImage: "./arrow.png",
+          radius: 1,
+          borderWidth: 8,
+          borderColor: "white",
+          lineColor: "white",
+          lineWidth: 2,
+          itemLabelColors: ["white"],
+          itemLabelRadius: 0.9,
+          itemLabelRadiusMax: 0.2,
+          itemLabelStrokeColor: "black",
+          itemLabelStrokeWidth: 1,
+          items,
+        }
+      );
+
+      const toast = bootstrap.Toast.getOrCreateInstance(
+        document.querySelector(".toast"),
+        { autohide: false }
+      );
+
+      const weighted_random = (options) => {
+        const weights = [options[0].weight];
+
+        let i;
+        for (i = 1; i < options.length; i++) {
+          weights[i] = options[i].weight + weights[i - 1];
+        }
+
+        const random = Math.random() * weights[weights.length - 1];
+
+        for (i = 0; i < weights.length; i++) {
+          if (weights[i] > random) break;
+        }
+
+        return i;
+      };
+
+      const audio = new Audio("sound.mp4");
+
+      let timeoutId = 0;
+      const spin = () => {
+        toast.hide();
+
+        audio.currentTime = 0;
+        audio.play();
+
+        const winningItemIndex = weighted_random(items);
+        const duration = 5000;
+        const spinToCenter = false;
+        const numberOfRevolutions = 5;
+        wheel.spinToItem(
+          winningItemIndex,
+          duration,
+          spinToCenter,
+          numberOfRevolutions,
+          1
+        );
+
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          document.querySelector(
+            ".toast-body"
+          ).innerHTML = `You won ${items[winningItemIndex].label}!`;
+          toast.show();
+        }, duration + 500);
+      };
+
+      const fullscreen = () => {
+        const requestMethod =
+          document.documentElement.requestFullScreen ||
+          document.documentElement.webkitRequestFullscreen ||
+          document.documentElement.webkitRequestFullScreen ||
+          document.documentElement.mozRequestFullScreen ||
+          document.documentElement.msRequestFullscreen;
+
+        requestMethod?.apply(document.documentElement);
+      };
+    </script>
+  </body>
+</html>
