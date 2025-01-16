@@ -190,10 +190,8 @@
         return `config.html?${params.toString()}`;
       }
 
-      document.querySelector(".btn-light").href = getConfigUrl();
-
-      // Handle fullscreen button visibility
       const configBtn = document.getElementById("configBtn");
+      configBtn.href = getConfigUrl();
 
       document.addEventListener("fullscreenchange", () => {
         configBtn.style.display = document.fullscreenElement ? "none" : "block";

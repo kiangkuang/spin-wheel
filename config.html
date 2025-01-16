@@ -108,18 +108,21 @@
       </div>
 
       <div>
+        <p class="text-muted mb-2">Recommended steps:</p>
+        <ol class="text-muted small mb-3">
+          <li>Open the wheel to verify your configuration</li>
+          <li>Copy the URL</li>
+          <li>Create a shorter link using TinyURL</li>
+        </ol>
+
         <div class="d-flex gap-2">
-          <a :href="wheelUrl" class="btn btn-primary">Open Wheel</a>
-          <button
-            @click="copyUrl"
-            class="btn btn-secondary"
-            v-text="copyBtnText"
-          ></button>
-        </div>
-        <div class="text-muted small mt-2">
-          Consider using
-          <a href="https://tinyurl.com/create.php" target="_blank">TinyURL</a>
-          to shorten the long URL!
+          <a :href="wheelUrl" class="btn btn-secondary">1. Open Wheel</a>
+          <button @click="copyUrl" class="btn btn-primary">
+            2. {{copyBtnText}}
+          </button>
+          <a href="https://tinyurl.com" target="_blank" class="btn btn-success">
+            3. Shorten URL
+          </a>
         </div>
       </div>
     </div>
