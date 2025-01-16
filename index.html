@@ -121,21 +121,15 @@
         { autohide: false },
       );
 
-      const weighted_random = (options) => {
-        const weights = [options[0].weight];
+      const weightedRandom = (options) => {
+        const totalWeight = options.reduce((sum, item) => sum + item.weight, 0);
+        const random = Math.random() * totalWeight;
 
-        let i;
-        for (i = 1; i < options.length; i++) {
-          weights[i] = options[i].weight + weights[i - 1];
-        }
-
-        const random = Math.random() * weights[weights.length - 1];
-
-        for (i = 0; i < weights.length; i++) {
-          if (weights[i] > random) break;
-        }
-
-        return i;
+        let currentWeight = 0;
+        return options.findIndex((item) => {
+          currentWeight += item.weight;
+          return currentWeight > random;
+        });
       };
 
       const audio = new Audio("sound.mp4");
@@ -146,7 +140,7 @@
         audio.currentTime = 0;
         audio.play();
 
-        const winningItemIndex = weighted_random(items);
+        const winningItemIndex = weightedRandom(items);
         const duration = 5000;
         const spinToCenter = false;
         const numberOfRevolutions = 5;
