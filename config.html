@@ -88,14 +88,19 @@
               <option value="brown"></option>
             </datalist>
           </div>
-          <div class="col-2">
-            <input
-              v-model.number="item.weight"
-              type="number"
-              class="form-control"
-              min="1"
-              placeholder="Weight"
-            />
+          <div class="col-5 col-md-3">
+            <div class="input-group">
+              <input
+                v-model.number="item.weight"
+                type="number"
+                class="form-control"
+                min="1"
+                placeholder="Weight"
+              />
+              <span class="input-group-text text-secondary">
+                {{ Math.round(item.weight / sumWeights * 1000) / 10 }}%
+              </span>
+            </div>
           </div>
           <div class="col-auto">
             <button @click="removeItem(index)" class="btn btn-danger w-100">
@@ -243,6 +248,10 @@
             items.value.splice(index, 1);
           };
 
+          const sumWeights = computed(() =>
+            items.value.reduce((sum, curr) => sum + curr.weight, 0),
+          );
+
           const wheelUrl = computed(() => {
             const params = new URLSearchParams();
             params.set("items", JSON.stringify(items.value));
@@ -288,6 +297,7 @@
             items,
             addItem,
             removeItem,
+            sumWeights,
             wheelUrl,
             getContrastColor,
             copyUrl,
