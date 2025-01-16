@@ -126,7 +126,7 @@
         </ol>
 
         <div class="d-flex gap-2">
-          <a :href="wheelUrl" class="btn btn-secondary">1. Open Wheel</a>
+          <a :href="wheelUrl" ref="wheelUrlElement" class="btn btn-secondary">1. Open Wheel</a>
           <button @click="copyUrl" class="btn btn-primary">
             2. {{copyBtnText}}
           </button>
@@ -212,7 +212,7 @@
 
         const copyUrl = () => {
           try {
-            const url = getAbsoluteUrl(wheelUrl.value);
+            const url = wheelUrlElement.value.href;
 
             navigator.clipboard.writeText(url).then(() => {
               copyBtnText.value = "Copied!";
@@ -239,7 +239,9 @@
           { deep: true },
         );
 
-        return { wheelUrl, copyUrl, copyBtnText };
+        const wheelUrlElement = ref(null);
+
+        return { wheelUrl, wheelUrlElement, copyUrl, copyBtnText };
       }
 
       function useItems() {
@@ -295,14 +297,10 @@
         return darkColors.includes(bgColor.toLowerCase()) ? "white" : "black";
       }
 
-      function getAbsoluteUrl(path) {
-        return new URL(path, window.location.origin).href;
-      }
-
       createApp({
         setup() {
           const { items, addItem, removeItem, sumWeights } = useItems();
-          const { wheelUrl, copyUrl, copyBtnText } = useUrlManagement(items);
+          const { wheelUrl,wheelUrlElement, copyUrl, copyBtnText } = useUrlManagement(items);
           const { draggingIndex, ...dragHandlers } = useDraggableList(items);
 
           return {
@@ -311,6 +309,7 @@
             removeItem,
             sumWeights,
             wheelUrl,
+            wheelUrlElement,
             copyUrl,
             copyBtnText,
             draggingIndex,
