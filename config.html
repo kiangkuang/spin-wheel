@@ -53,6 +53,9 @@
               @dragover.prevent
               @dragenter.prevent="dragEnter($event, index)"
               @dragend="dragEnd"
+              @touchstart="touchStart($event, index)"
+              @touchmove.prevent="touchMove($event)"
+              @touchend="touchEnd"
             >
               ⋮⋮
             </div>
@@ -124,6 +127,67 @@
     <script>
       const { createApp, ref, computed, watchEffect } = Vue;
 
+      const useDraggableList = (items) => {
+        const dragState = ref({
+          index: null,
+          touchY: null,
+        });
+
+        const reorderItems = (fromIndex, toIndex) => {
+          if (fromIndex === toIndex) return;
+          const [item] = items.value.splice(fromIndex, 1);
+          items.value.splice(toIndex, 0, item);
+          dragState.value.index = toIndex;
+        };
+
+        const findDropIndex = (clientY) => {
+          const elements = document.querySelectorAll(".row");
+          return Array.from(elements).findIndex((el, index) => {
+            if (index === dragState.value.index) return false;
+            const rect = el.getBoundingClientRect();
+            if (clientY < rect.top || clientY > rect.bottom) return false;
+
+            const movingDown = dragState.value.touchY < clientY;
+            const targetMiddle = rect.top + rect.height / 2;
+            return (
+              (movingDown && clientY > targetMiddle) ||
+              (!movingDown && clientY < targetMiddle)
+            );
+          });
+        };
+
+        const dragHandlers = {
+          dragStart: (e, index) => {
+            dragState.value.index = index;
+            e.dataTransfer.effectAllowed = "move";
+          },
+          dragEnter: (e, index) => reorderItems(dragState.value.index, index),
+          dragEnd: () => (dragState.value = { index: null, touchY: null }),
+          touchStart: (e, index) => {
+            dragState.value = {
+              index: index,
+              touchY: e.touches[0].clientY,
+            };
+          },
+          touchMove: (e) => {
+            if (dragState.value.index === null) return;
+            const currentY = e.touches[0].clientY;
+            const newIndex = findDropIndex(currentY);
+
+            if (newIndex !== -1) {
+              reorderItems(dragState.value.index, newIndex);
+            }
+            dragState.value.touchY = currentY;
+          },
+          touchEnd: () => (dragState.value = { index: null, touchY: null }),
+        };
+
+        return {
+          draggingIndex: computed(() => dragState.value.index),
+          ...dragHandlers,
+        };
+      };
+
       createApp({
         setup() {
           const parseItemsFromUrl = () => {
@@ -149,9 +213,17 @@
               : parsedItems,
           );
 
-          const draggingIndex = ref(null);
-
           const copyBtnText = ref("Copy URL");
+
+          const {
+            draggingIndex,
+            dragStart,
+            dragEnter,
+            dragEnd,
+            touchStart,
+            touchMove,
+            touchEnd,
+          } = useDraggableList(items);
 
           const addItem = () => {
             items.value.push({
@@ -198,25 +270,6 @@
             });
           };
 
-          const dragStart = (e, index) => {
-            draggingIndex.value = index;
-            e.dataTransfer.effectAllowed = "move";
-          };
-
-          const dragEnter = (e, index) => {
-            if (index === draggingIndex.value) return;
-
-            // Reorder items
-            const itemToMove = items.value[draggingIndex.value];
-            items.value.splice(draggingIndex.value, 1);
-            items.value.splice(index, 0, itemToMove);
-            draggingIndex.value = index;
-          };
-
-          const dragEnd = () => {
-            draggingIndex.value = null;
-          };
-
           // Update URL when items change
           watchEffect(
             () => {
@@ -236,10 +289,13 @@
             getContrastColor,
             copyUrl,
             copyBtnText,
+            draggingIndex,
             dragStart,
             dragEnter,
             dragEnd,
-            draggingIndex,
+            touchStart,
+            touchMove,
+            touchEnd,
           };
         },
       }).mount("#app");
