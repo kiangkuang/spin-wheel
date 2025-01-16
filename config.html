@@ -10,26 +10,28 @@
     />
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
+      /* Drag handle styling */
       .drag-handle {
         cursor: grab;
         color: var(--bs-secondary-color);
       }
-
       .dragging .drag-handle {
         cursor: grabbing;
       }
 
+      /* Drag and drop animations */
+      .dragging,
+      .row {
+        transition: box-shadow 0.2s, transform 0.2s, background-color 0.2s;
+      }
+      .row {
+        cursor: default;
+      }
       .dragging {
         opacity: 0.95;
         background-color: var(--bs-secondary-bg);
         box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 15px;
         transform: translate(8px, -4px);
-        transition: box-shadow 0.2s, transform 0.2s, background-color 0.2s;
-      }
-
-      .row {
-        cursor: default;
-        transition: box-shadow 0.2s, transform 0.2s, background-color 0.2s;
       }
     </style>
   </head>
@@ -73,7 +75,10 @@
               class="form-control"
               placeholder="Color"
               list="colorOptions"
-              :style="{ backgroundColor: item.backgroundColor, color: getContrastColor(item.backgroundColor) }"
+              :style="{
+                backgroundColor: item.backgroundColor,
+                color: getContrastColor(item.backgroundColor),
+              }"
             />
             <datalist id="colorOptions">
               <option value="red"></option>
@@ -196,102 +201,109 @@
         };
       };
 
-      createApp({
-        setup() {
-          const parseItemsFromUrl = () => {
-            try {
-              return JSON.parse(
-                new URLSearchParams(window.location.search).get("items"),
-              );
-            } catch (e) {
-              return null;
-            }
-          };
+      function useUrlManagement(items) {
+        const copyBtnText = ref("Copy URL");
 
-          const defaultItems = [
-            { label: "Item 1", backgroundColor: "orange", weight: 2 },
-            { label: "Item 2", backgroundColor: "navy", weight: 3 },
-            { label: "Item 3", backgroundColor: "red", weight: 4 },
-          ];
+        const wheelUrl = computed(() => {
+          const params = new URLSearchParams();
+          params.set("items", JSON.stringify(items.value));
+          return `index.html?${params.toString()}`;
+        });
 
-          const parsedItems = parseItemsFromUrl();
-          const items = ref(
-            !parsedItems || parsedItems.length === 0
-              ? defaultItems
-              : parsedItems,
-          );
+        const copyUrl = () => {
+          try {
+            const url = getAbsoluteUrl(wheelUrl.value);
 
-          const copyBtnText = ref("Copy URL");
-
-          const {
-            draggingIndex,
-            dragStart,
-            dragEnter,
-            dragEnd,
-            touchStart,
-            touchMove,
-            touchEnd,
-          } = useDraggableList(items);
-
-          const addItem = () => {
-            items.value.push({
-              label: `Item ${items.value.length + 1}`,
-              backgroundColor:
-                items.value.length >= 2
-                  ? items.value[items.value.length - 2].backgroundColor
-                  : "orange",
-              weight: 1,
+            navigator.clipboard.writeText(url).then(() => {
+              copyBtnText.value = "Copied!";
             });
-          };
+          } catch (e) {
+            console.error(e);
+            copyBtnText.value = "Copy Failed!";
+          } finally {
+            setTimeout(() => (copyBtnText.value = "Copy URL"), 2000);
+          }
+        };
 
-          const removeItem = (index) => {
-            items.value.splice(index, 1);
-          };
-
-          const sumWeights = computed(() =>
-            items.value.reduce((sum, curr) => sum + curr.weight, 0),
-          );
-
-          const wheelUrl = computed(() => {
+        // Sync URL with items state
+        watchEffect(
+          () => {
             const params = new URLSearchParams();
             params.set("items", JSON.stringify(items.value));
-            return `index.html?${params.toString()}`;
+            history.replaceState(
+              null,
+              "",
+              `${window.location.pathname}?${params}`,
+            );
+          },
+          { deep: true },
+        );
+
+        return { wheelUrl, copyUrl, copyBtnText };
+      }
+
+      function useItems() {
+        const defaultItems = [
+          { label: "Item 1", backgroundColor: "orange", weight: 2 },
+          { label: "Item 2", backgroundColor: "navy", weight: 3 },
+          { label: "Item 3", backgroundColor: "red", weight: 4 },
+        ];
+
+        const parsedItems = parseItemsFromUrl();
+        const items = ref(parsedItems?.length > 0 ? parsedItems : defaultItems);
+
+        const addItem = () => {
+          items.value.push({
+            label: `Item ${items.value.length + 1}`,
+            backgroundColor:
+              items.value.length >= 2
+                ? items.value[items.value.length - 2].backgroundColor
+                : "orange",
+            weight: 1,
           });
+        };
 
-          const getContrastColor = (bgColor = "") => {
-            // For common dark colors, return white
-            const darkColors = [
-              "navy",
-              "blue",
-              "purple",
-              "red",
-              "green",
-              "brown",
-              "black",
-            ];
-            if (darkColors.includes(bgColor.toLowerCase())) return "white";
-            return "black";
-          };
+        const removeItem = (index) => items.value.splice(index, 1);
 
-          const copyUrl = () => {
-            navigator.clipboard.writeText(wheelUrl.value).then(() => {
-              copyBtnText.value = "Copied!";
-              setTimeout(() => {
-                copyBtnText.value = "Copy URL";
-              }, 2000);
-            });
-          };
+        const sumWeights = computed(() =>
+          items.value.reduce((sum, curr) => sum + curr.weight, 0),
+        );
 
-          // Update URL when items change
-          watchEffect(
-            () => {
-              const params = new URLSearchParams(window.location.search);
-              params.set("items", JSON.stringify(items.value));
-              const newUrl = `${window.location.pathname}?${params.toString()}`;
-              history.replaceState(null, "", newUrl);
-            },
-            { deep: true },
+        return { items, addItem, removeItem, sumWeights };
+      }
+
+      function parseItemsFromUrl() {
+        try {
+          return JSON.parse(
+            new URLSearchParams(window.location.search).get("items"),
           );
+        } catch {
+          return null;
+        }
+      }
+
+      function getContrastColor(bgColor = "") {
+        const darkColors = [
+          "navy",
+          "blue",
+          "purple",
+          "red",
+          "green",
+          "brown",
+          "black",
+        ];
+        return darkColors.includes(bgColor.toLowerCase()) ? "white" : "black";
+      }
+
+      function getAbsoluteUrl(path) {
+        return new URL(path, window.location.origin).href;
+      }
+
+      createApp({
+        setup() {
+          const { items, addItem, removeItem, sumWeights } = useItems();
+          const { wheelUrl, copyUrl, copyBtnText } = useUrlManagement(items);
+          const { draggingIndex, ...dragHandlers } = useDraggableList(items);
 
           return {
             items,
@@ -299,16 +311,11 @@
             removeItem,
             sumWeights,
             wheelUrl,
-            getContrastColor,
             copyUrl,
             copyBtnText,
             draggingIndex,
-            dragStart,
-            dragEnter,
-            dragEnd,
-            touchStart,
-            touchMove,
-            touchEnd,
+            ...dragHandlers,
+            getContrastColor,
           };
         },
       }).mount("#app");
