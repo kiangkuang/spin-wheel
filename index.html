@@ -31,6 +31,7 @@
       class="position-fixed bottom-0 start-0 m-3 btn btn-light"
       style="z-index: 1000"
       onclick="event.stopPropagation()"
+      id="configBtn"
       >⚙️</a
     >
 
@@ -190,6 +191,13 @@
       }
 
       document.querySelector(".btn-light").href = getConfigUrl();
+
+      // Handle fullscreen button visibility
+      const configBtn = document.getElementById("configBtn");
+
+      document.addEventListener("fullscreenchange", () => {
+        configBtn.style.display = document.fullscreenElement ? "none" : "block";
+      });
     </script>
   </body>
 </html>
