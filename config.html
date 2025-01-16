@@ -126,7 +126,9 @@
         </ol>
 
         <div class="d-flex gap-2">
-          <a :href="wheelUrl" ref="wheelUrlElement" class="btn btn-secondary">1. Open Wheel</a>
+          <a :href="wheelUrl" ref="wheelUrlElement" class="btn btn-secondary">
+            1. Open Wheel
+          </a>
           <button @click="copyUrl" class="btn btn-primary">
             2. {{copyBtnText}}
           </button>
@@ -211,18 +213,12 @@
         });
 
         const copyUrl = () => {
-          try {
-            const url = wheelUrlElement.value.href;
+          const url = wheelUrlElement.value.href;
 
-            navigator.clipboard.writeText(url).then(() => {
-              copyBtnText.value = "Copied!";
-            });
-          } catch (e) {
-            console.error(e);
-            copyBtnText.value = "Copy Failed!";
-          } finally {
+          navigator.clipboard.writeText(url).then(() => {
+            copyBtnText.value = "Copied!";
             setTimeout(() => (copyBtnText.value = "Copy URL"), 2000);
-          }
+          });
         };
 
         // Sync URL with items state
@@ -300,7 +296,8 @@
       createApp({
         setup() {
           const { items, addItem, removeItem, sumWeights } = useItems();
-          const { wheelUrl,wheelUrlElement, copyUrl, copyBtnText } = useUrlManagement(items);
+          const { wheelUrl, wheelUrlElement, copyUrl, copyBtnText } =
+            useUrlManagement(items);
           const { draggingIndex, ...dragHandlers } = useDraggableList(items);
 
           return {
