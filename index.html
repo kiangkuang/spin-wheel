@@ -27,6 +27,13 @@
     "
     onclick="fullscreen()"
   >
+    <a
+      class="position-fixed bottom-0 start-0 m-3 btn btn-light"
+      style="z-index: 1000"
+      onclick="event.stopPropagation()"
+      >⚙️</a
+    >
+
     <div
       class="d-flex justify-content-center align-items-center flex-column"
       style="
@@ -36,7 +43,10 @@
         background: linear-gradient(to bottom, white 0%, transparent 30%);
       "
     >
-      <div class="d-flex justify-content-center align-items-center" style="margin: 0 5vw;">
+      <div
+        class="d-flex justify-content-center align-items-center"
+        style="margin: 0 5vw"
+      >
         <img src="spinwin.png" alt="Spin & Win" class="img-fluid" />
       </div>
       <div
@@ -78,23 +88,14 @@
     </div>
 
     <script>
-      const items = parseItemsFromUrl() ?? [
-        {
-          label: "one",
-          backgroundColor: "red",
-          weight: 2,
-        },
-        {
-          label: "two",
-          backgroundColor: "navy",
-          weight: 3,
-        },
-        {
-          label: "three",
-          backgroundColor: "orange",
-          weight: 4,
-        },
+      const defaultItems = [
+        { label: "Item 1", backgroundColor: "orange", weight: 2 },
+        { label: "Item 2", backgroundColor: "navy", weight: 3 },
+        { label: "Item 3", backgroundColor: "red", weight: 4 },
       ];
+      const parsedItems = parseItemsFromUrl();
+      const items =
+        !parsedItems || parsedItems.length === 0 ? defaultItems : parsedItems;
 
       const wheel = new spinWheel.Wheel(
         document.querySelector(".wheel-container"),
@@ -111,12 +112,12 @@
           itemLabelStrokeWidth: 1,
           items,
           onRest,
-        }
+        },
       );
 
       const toast = bootstrap.Toast.getOrCreateInstance(
         document.querySelector(".toast"),
-        { autohide: false }
+        { autohide: false },
       );
 
       const weighted_random = (options) => {
@@ -153,7 +154,7 @@
           duration,
           spinToCenter,
           numberOfRevolutions,
-          1
+          1,
         );
       }
 
@@ -176,12 +177,19 @@
       function parseItemsFromUrl() {
         try {
           return JSON.parse(
-            new URLSearchParams(window.location.search).get("items")
+            new URLSearchParams(window.location.search).get("items"),
           );
         } catch (e) {
           return null;
         }
       }
+
+      function getConfigUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return `config.html?${params.toString()}`;
+      }
+
+      document.querySelector(".btn-light").href = getConfigUrl();
     </script>
   </body>
 </html>
