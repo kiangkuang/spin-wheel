@@ -9,6 +9,7 @@
       rel="stylesheet"
     />
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
     <style>
       /* Drag handle styling */
       .drag-handle {
@@ -121,26 +122,52 @@
         <p class="text-muted mb-2">Recommended steps:</p>
         <ol class="text-muted small mb-3">
           <li>Open the wheel to verify your configuration</li>
-          <li>Copy the URL</li>
-          <li>Create a shorter link using TinyURL</li>
+          <li>
+            Copy and use the URL directly
+            <ul>
+              <li>
+                If the URL is too long, create a shorter link using
+                <a href="https://tinyurl.com" target="_blank">TinyURL</a>
+              </li>
+            </ul>
+          </li>
         </ol>
 
         <div class="d-flex gap-2">
           <a :href="wheelUrl" ref="wheelUrlElement" class="btn btn-secondary">
             1. Open Wheel
           </a>
-          <button @click="copyUrl" class="btn btn-primary">
+          <button @click="copyUrl" class="btn btn-success">
             2. {{copyBtnText}}
           </button>
-          <a href="https://tinyurl.com" target="_blank" class="btn btn-success">
-            3. Shorten URL
-          </a>
         </div>
       </div>
     </div>
 
     <script>
       const { createApp, ref, computed, watchEffect } = Vue;
+
+      // Add compression utilities
+      function compressItems(items) {
+        const jsonString = JSON.stringify(items);
+        const compressed = pako.deflate(new TextEncoder().encode(jsonString));
+        const base64Encoded = btoa(String.fromCharCode.apply(null, compressed));
+        return encodeURIComponent(base64Encoded);
+      }
+
+      // Add decompression utility
+      function decompressData(compressed) {
+        try {
+          const base64 = decodeURIComponent(compressed);
+          const binary = atob(base64);
+          const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+          const decompressed = pako.inflate(bytes, { to: "string" });
+          return JSON.parse(decompressed);
+        } catch (e) {
+          console.error("Failed to decompress data:", e);
+          return null;
+        }
+      }
 
       const useDraggableList = (items) => {
         const dragState = ref({
@@ -203,12 +230,14 @@
         };
       };
 
+      // Update URL management to use compression
       function useUrlManagement(items) {
         const copyBtnText = ref("Copy URL");
 
         const wheelUrl = computed(() => {
+          const compressed = compressItems(items.value);
           const params = new URLSearchParams();
-          params.set("items", JSON.stringify(items.value));
+          params.set("data", compressed);
           return `index.html?${params.toString()}`;
         });
 
@@ -225,7 +254,7 @@
         watchEffect(
           () => {
             const params = new URLSearchParams();
-            params.set("items", JSON.stringify(items.value));
+            params.set("data", compressItems(items.value));
             history.replaceState(
               null,
               "",
@@ -272,10 +301,16 @@
 
       function parseItemsFromUrl() {
         try {
-          return JSON.parse(
-            new URLSearchParams(window.location.search).get("items"),
-          );
-        } catch {
+          const params = new URLSearchParams(window.location.search);
+          const compressed = params.get("data");
+          if (compressed) {
+            return decompressData(compressed);
+          }
+
+          const items = params.get("items");
+          return items ? JSON.parse(items) : null;
+        } catch (e) {
+          console.error("Failed to parse items:", e);
           return null;
         }
       }
