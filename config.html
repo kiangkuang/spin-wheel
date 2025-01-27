@@ -8,33 +8,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
-    <style>
-      /* Drag handle styling */
-      .drag-handle {
-        cursor: grab;
-        color: var(--bs-secondary-color);
-      }
-      .dragging .drag-handle {
-        cursor: grabbing;
-      }
-
-      /* Drag and drop animations */
-      .dragging,
-      .row {
-        transition: box-shadow 0.2s, transform 0.2s, background-color 0.2s;
-      }
-      .row {
-        cursor: default;
-      }
-      .dragging {
-        opacity: 0.95;
-        background-color: var(--bs-secondary-bg);
-        box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 15px;
-        transform: translate(8px, -4px);
-      }
-    </style>
+    <link rel="stylesheet" href="css/styles.css" />
   </head>
 
   <body>
@@ -144,196 +118,31 @@
       </div>
     </div>
 
-    <script>
-      const { createApp, ref, computed, watchEffect } = Vue;
-
-      // Add compression utilities
-      function compressItems(items) {
-        const jsonString = JSON.stringify(items);
-        const compressed = pako.deflate(new TextEncoder().encode(jsonString));
-        const base64Encoded = btoa(String.fromCharCode.apply(null, compressed));
-        return encodeURIComponent(base64Encoded);
-      }
-
-      // Add decompression utility
-      function decompressData(compressed) {
-        try {
-          const base64 = decodeURIComponent(compressed);
-          const binary = atob(base64);
-          const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
-          const decompressed = pako.inflate(bytes, { to: "string" });
-          return JSON.parse(decompressed);
-        } catch (e) {
-          console.error("Failed to decompress data:", e);
-          return null;
-        }
-      }
-
-      const useDraggableList = (items) => {
-        const dragState = ref({
-          index: null,
-          touchY: null,
-        });
-
-        const reorderItems = (fromIndex, toIndex) => {
-          if (fromIndex === toIndex) return;
-          const [item] = items.value.splice(fromIndex, 1);
-          items.value.splice(toIndex, 0, item);
-          dragState.value.index = toIndex;
-        };
-
-        const findDropIndex = (clientY) => {
-          const elements = document.querySelectorAll(".row");
-          return Array.from(elements).findIndex((el, index) => {
-            if (index === dragState.value.index) return false;
-            const rect = el.getBoundingClientRect();
-            if (clientY < rect.top || clientY > rect.bottom) return false;
-
-            const movingDown = dragState.value.touchY < clientY;
-            const targetMiddle = rect.top + rect.height / 2;
-            return (
-              (movingDown && clientY > targetMiddle) ||
-              (!movingDown && clientY < targetMiddle)
-            );
-          });
-        };
-
-        const dragHandlers = {
-          dragStart: (e, index) => {
-            dragState.value.index = index;
-            e.dataTransfer.effectAllowed = "move";
-          },
-          dragEnter: (e, index) => reorderItems(dragState.value.index, index),
-          dragEnd: () => (dragState.value = { index: null, touchY: null }),
-          touchStart: (e, index) => {
-            dragState.value = {
-              index: index,
-              touchY: e.touches[0].clientY,
-            };
-          },
-          touchMove: (e) => {
-            if (dragState.value.index === null) return;
-            const currentY = e.touches[0].clientY;
-            const newIndex = findDropIndex(currentY);
-
-            if (newIndex !== -1) {
-              reorderItems(dragState.value.index, newIndex);
-            }
-            dragState.value.touchY = currentY;
-          },
-          touchEnd: () => (dragState.value = { index: null, touchY: null }),
-        };
-
-        return {
-          draggingIndex: computed(() => dragState.value.index),
-          ...dragHandlers,
-        };
-      };
-
-      // Update URL management to use compression
-      function useUrlManagement(items) {
-        const copyBtnText = ref("Copy URL");
-
-        const wheelUrl = computed(() => {
-          const compressed = compressItems(items.value);
-          const params = new URLSearchParams();
-          params.set("data", compressed);
-          return `index.html?${params.toString()}`;
-        });
-
-        const copyUrl = () => {
-          const url = wheelUrlElement.value.href;
-
-          navigator.clipboard.writeText(url).then(() => {
-            copyBtnText.value = "Copied!";
-            setTimeout(() => (copyBtnText.value = "Copy URL"), 2000);
-          });
-        };
-
-        // Sync URL with items state
-        watchEffect(
-          () => {
-            const params = new URLSearchParams();
-            params.set("data", compressItems(items.value));
-            history.replaceState(
-              null,
-              "",
-              `${window.location.pathname}?${params}`,
-            );
-          },
-          { deep: true },
-        );
-
-        const wheelUrlElement = ref(null);
-
-        return { wheelUrl, wheelUrlElement, copyUrl, copyBtnText };
-      }
-
-      function useItems() {
-        const defaultItems = [
-          { label: "Item 1", backgroundColor: "orange", weight: 2 },
-          { label: "Item 2", backgroundColor: "navy", weight: 3 },
-          { label: "Item 3", backgroundColor: "red", weight: 4 },
-        ];
-
-        const parsedItems = parseItemsFromUrl();
-        const items = ref(parsedItems?.length > 0 ? parsedItems : defaultItems);
-
-        const addItem = () => {
-          items.value.push({
-            label: `Item ${items.value.length + 1}`,
-            backgroundColor:
-              items.value.length >= 2
-                ? items.value[items.value.length - 2].backgroundColor
-                : "orange",
-            weight: 1,
-          });
-        };
-
-        const removeItem = (index) => items.value.splice(index, 1);
-
-        const sumWeights = computed(() =>
-          items.value.reduce((sum, curr) => sum + curr.weight, 0),
-        );
-
-        return { items, addItem, removeItem, sumWeights };
-      }
-
-      function parseItemsFromUrl() {
-        try {
-          const params = new URLSearchParams(window.location.search);
-          const compressed = params.get("data");
-          if (compressed) {
-            return decompressData(compressed);
-          }
-
-          const items = params.get("items");
-          return items ? JSON.parse(items) : null;
-        } catch (e) {
-          console.error("Failed to parse items:", e);
-          return null;
-        }
-      }
-
-      function getContrastColor(bgColor = "") {
-        const darkColors = [
-          "navy",
-          "blue",
-          "purple",
-          "red",
-          "green",
-          "brown",
-          "black",
-        ];
-        return darkColors.includes(bgColor.toLowerCase()) ? "white" : "black";
-      }
+    <script type="module">
+      import {
+        createApp,
+        ref,
+        computed,
+      } from "https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js";
+      import { useDraggableList } from "./js/composables/useDraggableList.js";
+      import { useUrlManagement } from "./js/composables/useUrlManagement.js";
+      import { useItems } from "./js/composables/useItems.js";
+      import { getContrastColor } from "./js/utils.js";
 
       createApp({
         setup() {
           const { items, addItem, removeItem, sumWeights } = useItems();
           const { wheelUrl, wheelUrlElement, copyUrl, copyBtnText } =
             useUrlManagement(items);
-          const { draggingIndex, ...dragHandlers } = useDraggableList(items);
+          const {
+            draggingIndex,
+            dragStart,
+            dragEnter,
+            dragEnd,
+            touchStart,
+            touchMove,
+            touchEnd,
+          } = useDraggableList(items);
 
           return {
             items,
@@ -345,7 +154,12 @@
             copyUrl,
             copyBtnText,
             draggingIndex,
-            ...dragHandlers,
+            dragStart,
+            dragEnter,
+            dragEnd,
+            touchStart,
+            touchMove,
+            touchEnd,
             getContrastColor,
           };
         },

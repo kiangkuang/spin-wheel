@@ -10,192 +10,53 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/spin-wheel@4.3.1/dist/spin-wheel-iife.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+    <script type="module" src="js/wheel.js"></script>
+    <link rel="stylesheet" href="css/styles.css" />
   </head>
 
-  <body
-    class="m-0 p-0"
-    style="
-      background-image: url('bg.jpg');
-      background-size: cover;
-      background-position: 50% 20%;
-    "
-    onclick="fullscreen()"
-  >
+  <body class="m-0 p-0 page-background" onclick="fullscreen()">
     <a
-      class="position-fixed bottom-0 start-0 m-3 btn btn-light"
-      style="z-index: 1000"
+      class="position-fixed bottom-0 start-0 m-3 btn btn-light config-button"
       onclick="event.stopPropagation()"
       id="configBtn"
       >⚙️</a
     >
 
     <div
-      class="d-flex justify-content-center align-items-center flex-column"
-      style="
-        height: 100vh;
-        width: 100vw;
-        gap: 15vh;
-        background: linear-gradient(to bottom, white 0%, transparent 30%);
-      "
+      class="d-flex justify-content-center align-items-center flex-column content-container"
     >
       <div
-        class="d-flex justify-content-center align-items-center"
-        style="margin: 0 5vw"
+        class="d-flex justify-content-center align-items-center logo-container"
       >
         <img src="spinwin.png" alt="Spin & Win" class="img-fluid" />
       </div>
       <div
         class="position-relative d-flex justify-content-center align-items-center"
       >
-        <div
-          class="wheel-container rounded-circle"
-          style="
-            width: min(95vw, 95vh);
-            height: min(95vw, 95vh);
-            max-height: min(70vh, 90vw);
-            max-width: min(70vh, 90vw);
-            box-shadow: black 0 0 min(5vw, 3vh);
-            outline: white solid min(2vw, 1vh);
-            outline-offset: max(-1vw, -0.5vh);
-          "
-          onclick="spin()"
-        ></div>
+        <div class="wheel-container rounded-circle" onclick="spin()"></div>
+
+        <div class="wheel-arrow position-absolute top-0"></div>
 
         <div
-          class="arrow position-absolute top-0"
-          style="
-            border-left: min(3vw, 2vh) solid transparent;
-            border-right: min(3vw, 2vh) solid transparent;
-            border-top: min(6vw, 4vh) solid white;
-          "
-        ></div>
-
-        <div
-          class="toast position-absolute text-center"
+          class="wheel-toast toast position-absolute text-center"
           onclick="toast.hide()"
-          style="
-            --bs-toast-max-width: 50vw;
-            --bs-toast-border-radius: min(2vw, 2vh);
-            --bs-toast-font-size: min(5vw, 5vh);
-          "
         ></div>
       </div>
     </div>
 
-    <script>
-      const defaultItems = [
-        { label: "Item 1", backgroundColor: "orange", weight: 2 },
-        { label: "Item 2", backgroundColor: "navy", weight: 3 },
-        { label: "Item 3", backgroundColor: "red", weight: 4 },
-      ];
-      const parsedItems = parseItemsFromUrl();
-      const items =
-        !parsedItems || parsedItems.length === 0 ? defaultItems : parsedItems;
+    <script type="module">
+      import { initWheel } from "./js/wheel.js";
+      import { requestFullscreen } from "./js/browserUtils.js";
 
-      const wheel = new spinWheel.Wheel(
-        document.querySelector(".wheel-container"),
-        {
-          isInteractive: false,
-          radius: 1,
-          borderWidth: 0,
-          lineColor: "white",
-          lineWidth: 2,
-          itemLabelColors: ["white"],
-          itemLabelRadius: 0.9,
-          itemLabelRadiusMax: 0.2,
-          itemLabelStrokeColor: "black",
-          itemLabelStrokeWidth: 1,
-          items,
-          onRest,
-        },
-      );
+      const { spin } = initWheel();
 
-      const toast = bootstrap.Toast.getOrCreateInstance(
-        document.querySelector(".toast"),
-        { autohide: false },
-      );
-
-      const weightedRandom = (options) => {
-        const totalWeight = options.reduce((sum, item) => sum + item.weight, 0);
-        const random = Math.random() * totalWeight;
-
-        let currentWeight = 0;
-        return options.findIndex((item) => {
-          currentWeight += item.weight;
-          return currentWeight > random;
-        });
-      };
-
-      const audio = new Audio("sound.mp4");
-
-      function spin() {
-        toast.hide();
-
-        audio.currentTime = 0;
-        audio.play();
-
-        const winningItemIndex = weightedRandom(items);
-        const duration = 5000;
-        const spinToCenter = false;
-        const numberOfRevolutions = 5;
-        wheel.spinToItem(
-          winningItemIndex,
-          duration,
-          spinToCenter,
-          numberOfRevolutions,
-          1,
-        );
-      }
-
-      function onRest({ currentIndex }) {
-        toast._element.innerHTML = `You won ${items[currentIndex].label}!`;
-        toast.show();
-      }
-
-      function fullscreen() {
-        const requestMethod =
-          document.documentElement.requestFullScreen ||
-          document.documentElement.webkitRequestFullscreen ||
-          document.documentElement.webkitRequestFullScreen ||
-          document.documentElement.mozRequestFullScreen ||
-          document.documentElement.msRequestFullscreen;
-
-        requestMethod?.apply(document.documentElement);
-      }
-
-      function decompressData(compressed) {
-        try {
-          const base64 = decodeURIComponent(compressed);
-          const binary = atob(base64);
-          const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
-          const decompressed = pako.inflate(bytes, { to: "string" });
-          return JSON.parse(decompressed);
-        } catch (e) {
-          console.error("Failed to decompress data:", e);
-          return null;
-        }
-      }
-
-      function parseItemsFromUrl() {
-        try {
-          const params = new URLSearchParams(window.location.search);
-          const compressed = params.get("data");
-          if (compressed) {
-            return decompressData(compressed);
-          }
-
-          const items = params.get("items");
-          return items ? JSON.parse(items) : null;
-        } catch (e) {
-          console.error("Failed to parse items:", e);
-          return null;
-        }
-      }
+      // Set up global functions
+      window.spin = spin;
+      window.fullscreen = () => requestFullscreen(document.documentElement);
 
       function getConfigUrl() {
-        const params = new URLSearchParams(window.location.search);
-        return `config.html?${params.toString()}`;
+        const params = new URLSearchParams(window.location.search).toString();
+        return params ? `config.html?${params}` : "config.html";
       }
 
       const configBtn = document.getElementById("configBtn");
