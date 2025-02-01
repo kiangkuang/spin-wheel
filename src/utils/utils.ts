@@ -1,13 +1,14 @@
-import pako from "https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.esm.mjs";
+import type { Item } from "@/stores/itemStore";
+import pako from "pako";
 
-export function compressData(data) {
+export function compressData(data: Item[]) {
   const jsonString = JSON.stringify(data);
   const compressed = pako.deflate(new TextEncoder().encode(jsonString));
-  const base64Encoded = btoa(String.fromCharCode.apply(null, compressed));
+  const base64Encoded = btoa(String.fromCharCode.apply(null, [...compressed]));
   return encodeURIComponent(base64Encoded);
 }
 
-export function decompressData(compressed) {
+export function decompressData(compressed: string) {
   try {
     const base64 = decodeURIComponent(compressed);
     const binary = atob(base64);
@@ -36,21 +37,7 @@ export function parseItemsFromUrl() {
   }
 }
 
-export function getContrastColor(bgColor = "") {
-  const darkColors = [
-    "navy",
-    "blue",
-    "purple",
-    "red",
-    "green",
-    "brown",
-    "black",
-  ];
+export function getContrastColor(bgColor: string) {
+  const darkColors = ["navy", "blue", "purple", "red", "green", "brown", "black"];
   return darkColors.includes(bgColor.toLowerCase()) ? "white" : "black";
 }
-
-export const defaultItems = [
-  { label: "Item 1", backgroundColor: "orange", weight: 2 },
-  { label: "Item 2", backgroundColor: "navy", weight: 3 },
-  { label: "Item 3", backgroundColor: "red", weight: 4 },
-];
