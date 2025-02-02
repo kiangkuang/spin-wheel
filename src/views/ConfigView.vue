@@ -94,7 +94,6 @@ const { copyUrl, copyBtnText } = useUrlManagement();
             name: RouteName.Wheel,
             query: items.length ? { data: compressData(items) } : undefined,
           }"
-          ref="wheelUrlElement"
           class="btn btn-secondary"
         >
           1. Open Wheel
