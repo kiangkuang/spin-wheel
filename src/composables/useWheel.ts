@@ -2,11 +2,10 @@ import sound from "@/assets/sound.mp4";
 import { type Item, useItemStore } from "@/stores/itemStore";
 import { Toast } from "bootstrap";
 import { storeToRefs } from "pinia";
-// @ts-expect-error missing type definitions
-import { Wheel } from "spin-wheel";
+import { Wheel, type WheelOptions } from "spin-wheel";
 import { type Ref, onMounted, ref } from "vue";
 
-const WHEEL_CONFIG = {
+const WHEEL_OPTIONS: WheelOptions = {
   isInteractive: false,
   radius: 1,
   borderWidth: 0,
@@ -17,13 +16,6 @@ const WHEEL_CONFIG = {
   itemLabelRadiusMax: 0.2,
   itemLabelStrokeColor: "black",
   itemLabelStrokeWidth: 1,
-};
-
-const SPIN_CONFIG = {
-  duration: 5000,
-  spinToCenter: false,
-  numberOfRevolutions: 5,
-  endRotation: 1,
 };
 
 function weightedRandom(options: Item[]) {
@@ -46,7 +38,7 @@ export function useWheel(wheelContainer: Ref<Element | null>, toastElement: Ref<
   onMounted(() => {
     if (wheelContainer.value) {
       wheel.value = new Wheel(wheelContainer.value, {
-        ...WHEEL_CONFIG,
+        ...WHEEL_OPTIONS,
         items: items.value,
         onRest: ({ currentIndex }: { currentIndex: number }) => {
           toastMessage.value = `You won ${items.value[currentIndex].label}!`;
@@ -66,13 +58,7 @@ export function useWheel(wheelContainer: Ref<Element | null>, toastElement: Ref<
     audio.play();
 
     const winningItemIndex = weightedRandom(items.value);
-    wheel.value?.spinToItem(
-      winningItemIndex,
-      SPIN_CONFIG.duration,
-      SPIN_CONFIG.spinToCenter,
-      SPIN_CONFIG.numberOfRevolutions,
-      SPIN_CONFIG.endRotation,
-    );
+    wheel.value?.spinToItem(winningItemIndex, 5000, false, 5, 1);
   };
 
   return {
