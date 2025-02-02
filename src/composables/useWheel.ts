@@ -1,8 +1,4 @@
-import { useToast } from "./useToast";
 import sound from "@/assets/sound.mp4";
-import { useItemStore } from "@/stores/itemStore";
-import { weightedRandom } from "@/utils/utils";
-import { storeToRefs } from "pinia";
 import { Wheel, type WheelOptions } from "spin-wheel";
 import { type Ref, onMounted, ref } from "vue";
 
@@ -20,35 +16,25 @@ const WHEEL_OPTIONS: WheelOptions = {
   itemLabelStrokeWidth: 1,
 };
 
-export function useWheel(wheelContainer: Ref<Element | null>, toastElement: Ref<Element | null>) {
+export function useWheel(wheelContainer: Ref<Element | null>, wheelOptions: WheelOptions) {
   const wheel = ref<Wheel>();
   const audio = new Audio(sound);
-  const { items } = storeToRefs(useItemStore());
-  const { show: showToast, toast, message: toastMessage } = useToast(toastElement);
 
   onMounted(() => {
     if (wheelContainer.value) {
       wheel.value = new Wheel(wheelContainer.value, {
         ...WHEEL_OPTIONS,
-        items: items.value,
-        onRest: ({ currentIndex }) => showToast(`You won ${items.value[currentIndex].label}!`),
+        ...wheelOptions,
       });
     }
   });
 
-  const spin = () => {
-    toast.value?.hide();
-
+  const spin = (itemIndex: number) => {
     audio.currentTime = 0;
     audio.play();
 
-    const winningItemIndex = weightedRandom(items.value.map((item) => item.weight));
-    wheel.value?.spinToItem(winningItemIndex, 5000, false, 5, 1);
+    wheel.value?.spinToItem(itemIndex, 5000, false, 5, 1);
   };
 
-  return {
-    spin,
-    toast,
-    toastMessage,
-  };
+  return { spin };
 }

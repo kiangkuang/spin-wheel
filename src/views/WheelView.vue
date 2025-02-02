@@ -1,16 +1,29 @@
 <script setup lang="ts">
+import { useToast } from "@/composables/useToast";
 import { useWheel } from "@/composables/useWheel";
 import { RouteName } from "@/router";
+import { useItemStore } from "@/stores/itemStore";
+import { weightedRandom } from "@/utils/utils";
 import { useFullscreen } from "@vueuse/core";
+import { storeToRefs } from "pinia";
 import { useTemplateRef } from "vue";
 import { useRoute } from "vue-router";
 
 const isProd = import.meta.env.PROD;
 
-const wheelContainer = useTemplateRef("wheelContainer");
 const toastElement = useTemplateRef("toastElement");
+const { toast, message: toastMessage, show: showToast, hide: hideToast } = useToast(toastElement);
 
-const { spin, toast, toastMessage } = useWheel(wheelContainer, toastElement);
+const { items } = storeToRefs(useItemStore());
+const wheelContainer = useTemplateRef("wheelContainer");
+const { spin } = useWheel(wheelContainer, {
+  items: items.value,
+  onSpin: () => hideToast(),
+  onRest: ({ currentIndex }) => showToast(`You won ${items.value[currentIndex].label}!`),
+});
+
+const getWinningItem = () => weightedRandom(items.value.map((item) => item.weight));
+
 const { isFullscreen, enter: enterFullscreen } = useFullscreen(document.documentElement);
 const { query } = useRoute();
 </script>
@@ -32,7 +45,11 @@ const { query } = useRoute();
         <img src="@/assets/spin-and-win.png" alt="Spin & Win" class="img-fluid" />
       </div>
       <div class="position-relative d-flex justify-content-center align-items-center">
-        <div ref="wheelContainer" class="wheel-container rounded-circle" @click="spin"></div>
+        <div
+          ref="wheelContainer"
+          class="wheel-container rounded-circle"
+          @click="spin(getWinningItem())"
+        ></div>
 
         <div class="wheel-arrow position-absolute"></div>
 
