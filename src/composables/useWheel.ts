@@ -8,7 +8,8 @@ import { type Ref, onMounted, ref } from "vue";
 const WHEEL_OPTIONS: WheelOptions = {
   isInteractive: false,
   radius: 1,
-  borderWidth: 0,
+  borderColor: "white",
+  borderWidth: 10,
   lineColor: "white",
   lineWidth: 2,
   itemLabelColors: ["white"],

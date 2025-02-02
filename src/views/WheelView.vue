@@ -34,7 +34,7 @@ const { query } = useRoute();
       <div class="position-relative d-flex justify-content-center align-items-center">
         <div ref="wheelContainer" class="wheel-container rounded-circle" @click="spin"></div>
 
-        <div class="wheel-arrow position-absolute top-0"></div>
+        <div class="wheel-arrow position-absolute"></div>
 
         <div ref="toastElement" class="toast position-absolute text-center" @click="toast?.hide">
           {{ toastMessage }}
@@ -72,14 +72,13 @@ const { query } = useRoute();
   max-height: min(70vh, 90vw);
   max-width: min(70vh, 90vw);
   box-shadow: black 0 0 min(5vw, 3vh);
-  outline: white solid min(2vw, 1vh);
-  outline-offset: max(-1vw, -0.5vh);
 }
 
 .wheel-arrow {
   border-left: min(3vw, 2vh) solid transparent;
   border-right: min(3vw, 2vh) solid transparent;
   border-top: min(6vw, 4vh) solid white;
+  top: min(1vw, 0.5vh);
 }
 
 .toast {
