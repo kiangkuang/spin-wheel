@@ -1,7 +1,7 @@
+import { useToast } from "./useToast";
 import sound from "@/assets/sound.mp4";
 import { useItemStore } from "@/stores/itemStore";
 import { weightedRandom } from "@/utils/utils";
-import { Toast } from "bootstrap";
 import { storeToRefs } from "pinia";
 import { Wheel, type WheelOptions } from "spin-wheel";
 import { type Ref, onMounted, ref } from "vue";
@@ -22,30 +22,23 @@ const WHEEL_OPTIONS: WheelOptions = {
 
 export function useWheel(wheelContainer: Ref<Element | null>, toastElement: Ref<Element | null>) {
   const wheel = ref<Wheel>();
-  const toast = ref<Toast>();
-  const toastMessage = ref<string>("");
   const audio = new Audio(sound);
   const { items } = storeToRefs(useItemStore());
+  const { show: showToast, toast, message: toastMessage } = useToast(toastElement);
 
   onMounted(() => {
     if (wheelContainer.value) {
       wheel.value = new Wheel(wheelContainer.value, {
         ...WHEEL_OPTIONS,
         items: items.value,
-        onRest: ({ currentIndex }: { currentIndex: number }) => {
-          toastMessage.value = `You won ${items.value[currentIndex].label}!`;
-          toast.value?.show();
-        },
+        onRest: ({ currentIndex }) => showToast(`You won ${items.value[currentIndex].label}!`),
       });
-    }
-
-    if (toastElement.value) {
-      toast.value = Toast.getOrCreateInstance(toastElement.value, { autohide: false });
     }
   });
 
   const spin = () => {
     toast.value?.hide();
+
     audio.currentTime = 0;
     audio.play();
 
