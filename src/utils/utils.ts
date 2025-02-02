@@ -41,3 +41,17 @@ export function getContrastColor(bgColor: string) {
   const darkColors = ["navy", "blue", "purple", "red", "green", "brown", "black"];
   return darkColors.includes(bgColor.toLowerCase()) ? "white" : "black";
 }
+
+export function sum(array: number[]) {
+  return array.reduce((sum, value) => sum + value, 0);
+}
+
+export function weightedRandom(weights: number[]) {
+  const totalWeight = sum(weights);
+  const random = Math.random() * totalWeight;
+  let currentWeight = 0;
+  return weights.findIndex((weight) => {
+    currentWeight += weight;
+    return currentWeight > random;
+  });
+}

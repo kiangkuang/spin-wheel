@@ -1,4 +1,4 @@
-import { parseItemsFromUrl } from "@/utils/utils";
+import { parseItemsFromUrl, sum } from "@/utils/utils";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
@@ -17,7 +17,7 @@ export const defaultItems = [
 export const useItemStore = defineStore("item", () => {
   const items = ref<Item[]>(parseItemsFromUrl()?.length > 0 ? parseItemsFromUrl() : defaultItems);
 
-  const sumWeights = computed(() => items.value.reduce((sum, curr) => sum + curr.weight, 0));
+  const sumWeights = computed(() => sum(items.value.map((item) => item.weight)));
 
   const addItem = (item?: Item) => {
     items.value.push(

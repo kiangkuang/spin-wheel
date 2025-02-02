@@ -1,5 +1,6 @@
 import sound from "@/assets/sound.mp4";
-import { type Item, useItemStore } from "@/stores/itemStore";
+import { useItemStore } from "@/stores/itemStore";
+import { weightedRandom } from "@/utils/utils";
 import { Toast } from "bootstrap";
 import { storeToRefs } from "pinia";
 import { Wheel, type WheelOptions } from "spin-wheel";
@@ -18,16 +19,6 @@ const WHEEL_OPTIONS: WheelOptions = {
   itemLabelStrokeColor: "black",
   itemLabelStrokeWidth: 1,
 };
-
-function weightedRandom(options: Item[]) {
-  const totalWeight = options.reduce((sum, item) => sum + item.weight, 0);
-  const random = Math.random() * totalWeight;
-  let currentWeight = 0;
-  return options.findIndex((item) => {
-    currentWeight += item.weight;
-    return currentWeight > random;
-  });
-}
 
 export function useWheel(wheelContainer: Ref<Element | null>, toastElement: Ref<Element | null>) {
   const wheel = ref<Wheel>();
@@ -58,7 +49,7 @@ export function useWheel(wheelContainer: Ref<Element | null>, toastElement: Ref<
     audio.currentTime = 0;
     audio.play();
 
-    const winningItemIndex = weightedRandom(items.value);
+    const winningItemIndex = weightedRandom(items.value.map((item) => item.weight));
     wheel.value?.spinToItem(winningItemIndex, 5000, false, 5, 1);
   };
 
