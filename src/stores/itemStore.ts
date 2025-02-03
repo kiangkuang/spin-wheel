@@ -10,16 +10,18 @@ export interface Item {
   backgroundColor: Color;
 }
 
-export const defaultItems: Item[] = [
-  { label: "Item 1", backgroundColor: Color.Orange, weight: 2 },
-  { label: "Item 2", backgroundColor: Color.Navy, weight: 3 },
-  { label: "Item 3", backgroundColor: Color.Red, weight: 4 },
-];
+export function getDefaultItems(): Item[] {
+  return [
+    { label: "Item 1", backgroundColor: Color.Orange, weight: 2 },
+    { label: "Item 2", backgroundColor: Color.Navy, weight: 3 },
+    { label: "Item 3", backgroundColor: Color.Red, weight: 4 },
+  ];
+}
 
 export const useItemStore = defineStore("item", () => {
   const { query } = useRoute();
   const parsed = parseFromQuery<Item[]>(query);
-  const items = ref(parsed && parsed.length > 0 ? parsed : defaultItems);
+  const items = ref(parsed && parsed.length > 0 ? parsed : getDefaultItems());
 
   const sumWeights = computed(() => sum(items.value.map((item) => item.weight)));
 

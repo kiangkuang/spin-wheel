@@ -2,7 +2,7 @@
 import { useToast } from "@/composables/useToast";
 import { useWheel } from "@/composables/useWheel";
 import { RouteName } from "@/router";
-import { useItemStore } from "@/stores/itemStore";
+import { getDefaultItems, useItemStore } from "@/stores/itemStore";
 import { weightedRandom } from "@/utils/utils";
 import { useFullscreen } from "@vueuse/core";
 import { storeToRefs } from "pinia";
@@ -17,7 +17,7 @@ const { toast, message: toastMessage, show: showToast, hide: hideToast } = useTo
 const { items } = storeToRefs(useItemStore());
 const wheelContainer = useTemplateRef("wheelContainer");
 const { spin } = useWheel(wheelContainer, {
-  items: items.value,
+  items: items.value.length ? items.value : getDefaultItems(),
   onSpin: () => hideToast(),
   onRest: ({ currentIndex }) => showToast(`You won ${items.value[currentIndex].label}!`),
 });
