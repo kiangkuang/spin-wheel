@@ -1,6 +1,7 @@
-import { parseItemsFromUrl, sum } from "@/utils/utils";
+import { parseFromQuery, sum } from "@/utils/utils";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
+import { useRoute } from "vue-router";
 
 export interface Item {
   label: string;
@@ -15,7 +16,9 @@ export const defaultItems = [
 ];
 
 export const useItemStore = defineStore("item", () => {
-  const items = ref<Item[]>(parseItemsFromUrl()?.length > 0 ? parseItemsFromUrl() : defaultItems);
+  const { query } = useRoute();
+  const parsed = parseFromQuery<Item[]>(query);
+  const items = ref(parsed && parsed.length > 0 ? parsed : defaultItems);
 
   const sumWeights = computed(() => sum(items.value.map((item) => item.weight)));
 
