@@ -1,6 +1,6 @@
 import sound from "@/assets/sound.mp4";
 import { Wheel, type WheelOptions } from "spin-wheel";
-import { type Ref, onMounted, ref } from "vue";
+import { type Ref, onMounted, onUnmounted, ref } from "vue";
 
 const WHEEL_OPTIONS: WheelOptions = {
   isInteractive: false,
@@ -27,6 +27,9 @@ export function useWheel(wheelContainer: Ref<Element | null>, wheelOptions: Whee
         ...wheelOptions,
       });
     }
+  });
+  onUnmounted(() => {
+    audio.pause();
   });
 
   const spin = (itemIndex: number) => {
