@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router";
 export enum RouteName {
   Wheel = "Wheel",
   Config = "Config",
+  NotFound = "NotFound",
 }
 
 const router = createRouter({
@@ -21,6 +22,11 @@ const router = createRouter({
       name: RouteName.Config,
       component: () => import("@/views/ConfigView.vue"),
     },
+    {
+      path: '/:catchAll(.*)',
+      name: RouteName.NotFound,
+      component: WheelView,
+    }
   ],
 });
 
