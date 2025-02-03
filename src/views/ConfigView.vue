@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useUrlManagement } from "@/composables/useUrlManagement";
+import { WHEEL_COLORS } from "@/constants/colors";
 import { RouteName } from "@/router";
 import { useItemStore } from "@/stores/itemStore";
 import { compressData, getContrastColor } from "@/utils/utils";
@@ -47,16 +48,7 @@ useSortable(el, items, {
               }"
             />
             <datalist id="colorOptions">
-              <option value="red"></option>
-              <option value="blue"></option>
-              <option value="green"></option>
-              <option value="yellow"></option>
-              <option value="orange"></option>
-              <option value="purple"></option>
-              <option value="pink"></option>
-              <option value="navy"></option>
-              <option value="teal"></option>
-              <option value="brown"></option>
+              <option v-for="color in WHEEL_COLORS" :key="color" :value="color"></option>
             </datalist>
           </div>
           <div class="col-5 col-md-3">

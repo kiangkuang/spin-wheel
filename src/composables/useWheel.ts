@@ -1,20 +1,7 @@
 import sound from "@/assets/sound.mp4";
+import { DEFAULT_WHEEL_OPTIONS, SPIN_SETTINGS } from "@/constants/wheelConfig";
 import { Wheel, type WheelOptions } from "spin-wheel";
 import { type Ref, onMounted, onUnmounted, ref } from "vue";
-
-const WHEEL_OPTIONS: WheelOptions = {
-  isInteractive: false,
-  radius: 1,
-  borderColor: "white",
-  borderWidth: 10,
-  lineColor: "white",
-  lineWidth: 2,
-  itemLabelColors: ["white"],
-  itemLabelRadius: 0.9,
-  itemLabelRadiusMax: 0.2,
-  itemLabelStrokeColor: "black",
-  itemLabelStrokeWidth: 1,
-};
 
 export function useWheel(wheelContainer: Ref<Element | null>, wheelOptions: WheelOptions) {
   const wheel = ref<Wheel>();
@@ -23,7 +10,7 @@ export function useWheel(wheelContainer: Ref<Element | null>, wheelOptions: Whee
   onMounted(() => {
     if (wheelContainer.value) {
       wheel.value = new Wheel(wheelContainer.value, {
-        ...WHEEL_OPTIONS,
+        ...DEFAULT_WHEEL_OPTIONS,
         ...wheelOptions,
       });
     }
@@ -36,7 +23,13 @@ export function useWheel(wheelContainer: Ref<Element | null>, wheelOptions: Whee
     audio.currentTime = 0;
     audio.play();
 
-    wheel.value?.spinToItem(itemIndex, 5000, false, 5, 1);
+    wheel.value?.spinToItem(
+      itemIndex,
+      SPIN_SETTINGS.DURATION_MS,
+      SPIN_SETTINGS.SPIN_TO_CENTER,
+      SPIN_SETTINGS.REVOLUTIONS,
+      SPIN_SETTINGS.DIRECTION,
+    );
   };
 
   return { spin };

@@ -1,3 +1,4 @@
+import { Color } from "@/constants/enums";
 import { parseFromQuery, sum } from "@/utils/utils";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
@@ -6,13 +7,13 @@ import { useRoute } from "vue-router";
 export interface Item {
   label: string;
   weight: number;
-  backgroundColor: string;
+  backgroundColor: Color;
 }
 
-export const defaultItems = [
-  { label: "Item 1", backgroundColor: "orange", weight: 2 },
-  { label: "Item 2", backgroundColor: "navy", weight: 3 },
-  { label: "Item 3", backgroundColor: "red", weight: 4 },
+export const defaultItems: Item[] = [
+  { label: "Item 1", backgroundColor: Color.Orange, weight: 2 },
+  { label: "Item 2", backgroundColor: Color.Navy, weight: 3 },
+  { label: "Item 3", backgroundColor: Color.Red, weight: 4 },
 ];
 
 export const useItemStore = defineStore("item", () => {
@@ -27,7 +28,9 @@ export const useItemStore = defineStore("item", () => {
       item ?? {
         label: `Item ${items.value.length + 1}`,
         backgroundColor:
-          items.value.length >= 2 ? items.value[items.value.length - 2].backgroundColor : "orange",
+          items.value.length >= 2
+            ? (items.value[items.value.length - 2].backgroundColor as Color)
+            : Color.Orange,
         weight: 1,
       },
     );

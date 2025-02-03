@@ -1,3 +1,5 @@
+import { DARK_COLORS } from "@/constants/colors";
+import { Color } from "@/constants/enums";
 import pako from "pako";
 import type { LocationQuery } from "vue-router";
 
@@ -40,9 +42,8 @@ export function parseFromQuery<T>(query: LocationQuery) {
   }
 }
 
-export function getContrastColor(bgColor: string) {
-  const darkColors = ["navy", "blue", "purple", "red", "green", "brown", "black"];
-  return darkColors.includes(bgColor.toLowerCase()) ? "white" : "black";
+export function getContrastColor(bgColor: string): Color.White | Color.Black {
+  return DARK_COLORS.includes(bgColor.toLowerCase() as Color) ? Color.White : Color.Black;
 }
 
 export function sum(array: number[]) {

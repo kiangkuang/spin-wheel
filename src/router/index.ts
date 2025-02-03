@@ -23,10 +23,10 @@ const router = createRouter({
       component: () => import("@/views/ConfigView.vue"),
     },
     {
-      path: '/:catchAll(.*)',
+      path: "/:catchAll(.*)",
       name: RouteName.NotFound,
       component: WheelView,
-    }
+    },
   ],
 });
 
