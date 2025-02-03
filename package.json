@@ -14,13 +14,14 @@
   },
   "dependencies": {
     "@vueuse/core": "^12.5.0",
+    "@vueuse/integrations": "^12.5.0",
     "bootstrap": "^5.3.3",
     "pako": "^2.1.0",
     "pinia": "^2.3.1",
+    "sortablejs": "^1.15.6",
     "spin-wheel": "^5.0.2",
     "vue": "^3.5.13",
-    "vue-router": "^4.5.0",
-    "vuedraggable": "^4.1.0"
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
