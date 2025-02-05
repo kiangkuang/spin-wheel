@@ -29,7 +29,7 @@
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@tsconfig/node22": "^22.0.0",
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^22.13.0",
+    "@types/node": "^22.13.1",
     "@types/pako": "^2.0.3",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/eslint-config-prettier": "^10.2.0",
@@ -47,9 +47,9 @@
     "vite-plugin-vue-devtools": "^7.7.1",
     "vue-tsc": "^2.2.0"
   },
-  "packageManager": "pnpm@10.1.0",
   "lint-staged": {
     "*.{js,ts,vue}": "eslint --cache --fix",
     "src/**/*.{js,ts,vue,json,yml,yaml,md}": "prettier --write"
-  }
+  },
+  "packageManager": "pnpm@10.2.0"
 }
